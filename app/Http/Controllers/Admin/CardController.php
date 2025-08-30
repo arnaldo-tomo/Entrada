@@ -125,13 +125,13 @@ class CardController extends Controller
         $card->update(['qr_code_path' => $qrPath]);
     }
 
-    private function exportPdf(Card $card)
-    {
-        $pdf = Pdf::loadView('admin.cards.pdf', compact('card'))
-            ->setPaper([0, 0, $card->cardTemplate->width * 2.83, $card->cardTemplate->height * 2.83]);
+    // private function exportPdf(Card $card)
+    // {
+    //     $pdf = Pdf::loadView('admin.cards.pdf', compact('card'))
+    //         ->setPaper([0, 0, $card->cardTemplate->width * 2.83, $card->cardTemplate->height * 2.83]);
 
-        return $pdf->download('cartao-' . $card->serial_number . '.pdf');
-    }
+    //     return $pdf->download('cartao-' . $card->serial_number . '.pdf');
+    // }
 
     private function exportImage(Card $card, $format)
     {
@@ -139,4 +139,26 @@ class CardController extends Controller
         // Por agora, retornamos um redirect para o preview
         return redirect()->route('admin.cards.preview', $card);
     }
+
+    private function exportPdf(Card $card)
+{
+    // Carregar as informações necessárias
+    $card->load(['employee', 'cardTemplate', 'verificationLogs']);
+
+    // Configurar o PDF com orientação e tamanho adequados
+    $pdf = Pdf::loadView('admin.cards.pdf', compact('card'))
+        ->setPaper('A4', 'portrait')
+        ->setOptions([
+            'defaultFont' => 'Arial',
+            'isRemoteEnabled' => true,
+            'isHtml5ParserEnabled' => true,
+            'isPhpEnabled' => true,
+            'dpi' => 300,
+            'defaultPaperSize' => 'A4',
+            'fontHeightRatio' => 1.1,
+            'chroot' => public_path(),
+        ]);
+
+    return $pdf->download('cartao-' . $card->serial_number . '.pdf');
+}
 }

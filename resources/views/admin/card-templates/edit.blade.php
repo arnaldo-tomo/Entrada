@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Editar Template - ' . $template->name)
+@section('title', 'Editar Template - ' . $cardTemplate->name)
 
 @section('content')
 <div class="space-y-6">
@@ -10,9 +10,9 @@
             <div class="flex items-center justify-between">
                 <div>
                     <h2 class="text-2xl font-bold text-gray-800">Editar Template</h2>
-                    <p class="text-gray-600">Atualize o template "{{ $template->name }}"</p>
+                    <p class="text-gray-600">Atualize o template "{{ $cardTemplate->name }}"</p>
                 </div>
-                <a href="{{ route('admin.card-templates.show', $template) }}" class="inline-flex items-center px-4 py-2 text-xs font-semibold tracking-widest text-white uppercase bg-gray-600 border border-transparent rounded-md hover:bg-gray-700">
+                <a href="{{ route('admin.card-templates.show', $cardTemplate) }}" class="inline-flex items-center px-4 py-2 text-xs font-semibold tracking-widest text-white uppercase bg-gray-600 border border-transparent rounded-md hover:bg-gray-700">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                     </svg>
@@ -24,7 +24,7 @@
 
     <!-- Form -->
     <div class="overflow-hidden bg-white rounded-lg shadow-sm">
-        <form action="{{ route('admin.card-templates.update', $template) }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('admin.card-templates.update', $cardTemplate) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
             <div class="p-6 space-y-6">
@@ -36,8 +36,8 @@
                         <div class="text-center">
                             <p class="mb-2 text-sm text-gray-500">Frente</p>
                             <div class="relative mx-auto" style="width: 200px; height: 125px;">
-                                @if($template->front_design_url)
-                                    <img src="{{ $template->front_design_url }}" class="object-cover w-full h-full border border-gray-300 rounded-lg">
+                                @if($cardTemplate->front_design_url)
+                                    <img src="{{ $cardTemplate->front_design_url }}" class="object-cover w-full h-full border border-gray-300 rounded-lg">
                                 @else
                                     <div class="flex items-center justify-center w-full h-full text-white border border-gray-300 rounded-lg bg-gradient-to-br from-blue-600 to-blue-800">
                                         <span class="text-xs">Design Padrão</span>
@@ -50,8 +50,8 @@
                         <div class="text-center">
                             <p class="mb-2 text-sm text-gray-500">Verso</p>
                             <div class="relative mx-auto" style="width: 200px; height: 125px;">
-                                @if($template->back_design_url)
-                                    <img src="{{ $template->back_design_url }}" class="object-cover w-full h-full border border-gray-300 rounded-lg">
+                                @if($cardTemplate->back_design_url)
+                                    <img src="{{ $cardTemplate->back_design_url }}" class="object-cover w-full h-full border border-gray-300 rounded-lg">
                                 @else
                                     <div class="flex items-center justify-center w-full h-full text-white border border-gray-300 rounded-lg bg-gradient-to-br from-gray-600 to-gray-800">
                                         <span class="text-xs">Design Padrão</span>
@@ -65,7 +65,7 @@
                 <!-- Nome do Template -->
                 <div>
                     <label for="name" class="block text-sm font-medium text-gray-700">Nome do Template *</label>
-                    <input type="text" name="name" id="name" value="{{ old('name', $template->name) }}" required
+                    <input type="text" name="name" id="name" value="{{ old('name', $cardTemplate->name) }}" required
                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm @error('name') border-red-300 @enderror">
                     @error('name')
                         <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
@@ -76,7 +76,7 @@
                 <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                     <div>
                         <label for="width" class="block text-sm font-medium text-gray-700">Largura (mm) *</label>
-                        <input type="number" name="width" id="width" value="{{ old('width', $template->width) }}" step="0.01" min="50" max="200" required
+                        <input type="number" name="width" id="width" value="{{ old('width', $cardTemplate->width) }}" step="0.01" min="50" max="200" required
                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm @error('width') border-red-300 @enderror">
                         @error('width')
                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
@@ -85,7 +85,7 @@
 
                     <div>
                         <label for="height" class="block text-sm font-medium text-gray-700">Altura (mm) *</label>
-                        <input type="number" name="height" id="height" value="{{ old('height', $template->height) }}" step="0.01" min="30" max="150" required
+                        <input type="number" name="height" id="height" value="{{ old('height', $cardTemplate->height) }}" step="0.01" min="30" max="150" required
                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm @error('height') border-red-300 @enderror">
                         @error('height')
                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
@@ -97,8 +97,8 @@
                 <div>
                     <label for="is_active" class="block text-sm font-medium text-gray-700">Status</label>
                     <select name="is_active" id="is_active" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm">
-                        <option value="1" {{ old('is_active', $template->is_active) ? 'selected' : '' }}>Ativo</option>
-                        <option value="0" {{ old('is_active', $template->is_active) == false ? 'selected' : '' }}>Inativo</option>
+                        <option value="1" {{ old('is_active', $cardTemplate->is_active) ? 'selected' : '' }}>Ativo</option>
+                        <option value="0" {{ old('is_active', $cardTemplate->is_active) == false ? 'selected' : '' }}>Inativo</option>
                     </select>
                 </div>
 
@@ -152,7 +152,7 @@
             </div>
 
             <div class="flex justify-end px-6 py-4 space-x-3 border-t border-gray-200 bg-gray-50">
-                <a href="{{ route('admin.card-templates.show', $template) }}" class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                <a href="{{ route('admin.card-templates.show', $cardTemplate) }}" class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
                     Cancelar
                 </a>
                 <button type="submit" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-purple-600 border border-transparent rounded-md shadow-sm hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
@@ -166,7 +166,7 @@
     </div>
 
     <!-- Template Impact -->
-    @if($template->cards->count() > 0)
+    @if($cardTemplate->cards->count() > 0)
         <div class="p-6 border border-yellow-200 rounded-lg bg-yellow-50">
             <div class="flex">
                 <div class="flex-shrink-0">
@@ -177,7 +177,7 @@
                 <div class="ml-3">
                     <h3 class="text-sm font-medium text-yellow-800">Atenção</h3>
                     <p class="mt-1 text-sm text-yellow-700">
-                        Este template possui {{ $template->cards->count() }} cartão(s) emitido(s).
+                        Este template possui {{ $cardTemplate->cards->count() }} cartão(s) emitido(s).
                         Alterações nas dimensões podem afetar a impressão de cartões já criados.
                     </p>
                 </div>

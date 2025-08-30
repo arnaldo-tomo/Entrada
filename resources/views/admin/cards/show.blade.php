@@ -45,7 +45,7 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <!-- Card Information -->
         <div class="space-y-6 lg:col-span-2">
             <!-- Employee Info -->

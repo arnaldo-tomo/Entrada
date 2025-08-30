@@ -1,173 +1,409 @@
+<?php
+// resources/views/admin/cards/pdf.blade.php (VERSÃO MELHORADA)
+?>
+
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
     <title>Cartão - {{ $card->employee->name }}</title>
     <style>
+        @page {
+            margin: 20px;
+            size: A4;
+        }
+
         body {
             margin: 0;
-            padding: 20px;
-            font-family: Arial, sans-serif;
-            background: white;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background: #f8f9fa;
+            color: #333;
         }
 
-        .card-container {
+        .page {
+            page-break-after: always;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 90vh;
+            padding: 40px;
+        }
+
+        .page:last-child {
+            page-break-after: avoid;
+        }
+
+        .card {
             width: {{ $card->cardTemplate->width * 3.78 }}px;
             height: {{ $card->cardTemplate->height * 3.78 }}px;
-            margin: 0 auto 30px;
-            position: relative;
-            border-radius: 8px;
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            position: relative;
+            border: 2px solid #e1e5e9;
         }
 
+        /* FRENTE DO CARTÃO */
         .card-front {
-            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 15px;
+            padding: 20px;
             height: 100%;
             box-sizing: border-box;
             position: relative;
+            overflow: hidden;
         }
 
-        .card-back {
-            background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
-            color: white;
-            padding: 15px;
-            height: 100%;
-            box-sizing: border-box;
+        .card-front::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            transform: rotate(45deg);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
             position: relative;
+            z-index: 2;
+        }
+
+        .company-logo {
+            font-size: 12px;
+            font-weight: bold;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .card-type {
+            font-size: 10px;
+            opacity: 0.8;
+            background: rgba(255,255,255,0.2);
+            padding: 4px 8px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        .content {
+            display: flex;
+            gap: 20px;
+            position: relative;
+            z-index: 2;
+            height: calc(100% - 80px);
+        }
+
+        .photo-section {
+            flex-shrink: 0;
         }
 
         .employee-photo {
-            width: 60px;
-            height: 75px;
+            width: 70px;
+            height: 85px;
+            border-radius: 8px;
             object-fit: cover;
-            border-radius: 4px;
-            border: 2px solid rgba(255,255,255,0.3);
-            float: left;
-            margin-right: 15px;
+            border: 3px solid rgba(255,255,255,0.3);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
         }
 
-        .employee-info {
-            margin-top: 80px;
-            clear: both;
+        .info-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .employee-name {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: bold;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
         .employee-position {
-            font-size: 12px;
-            opacity: 0.9;
-            margin-bottom: 3px;
+            font-size: 13px;
+            margin-bottom: 4px;
+            opacity: 0.95;
+            font-weight: 500;
         }
 
         .employee-department {
-            font-size: 10px;
-            opacity: 0.7;
+            font-size: 11px;
+            opacity: 0.8;
+            margin-bottom: 15px;
         }
 
-        .serial-number {
-            position: absolute;
-            bottom: 15px;
-            left: 15px;
+        .employee-id {
             font-size: 10px;
-            opacity: 0.7;
+            font-family: 'Courier New', monospace;
+            background: rgba(255,255,255,0.2);
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            backdrop-filter: blur(10px);
         }
 
-        .issue-date {
+        .footer {
             position: absolute;
-            bottom: 15px;
-            right: 15px;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 9px;
+            opacity: 0.8;
+            z-index: 2;
+        }
+
+        /* VERSO DO CARTÃO */
+        .card-back {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 20px;
+            height: 100%;
+            box-sizing: border-box;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-back::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="0.5" fill="rgba(255,255,255,0.05)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .back-header {
+            text-align: center;
+            margin-bottom: 25px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .back-title {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .back-subtitle {
             font-size: 10px;
-            opacity: 0.7;
+            opacity: 0.8;
+        }
+
+        .back-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: calc(100% - 120px);
+            position: relative;
+            z-index: 2;
+        }
+
+        .qr-section {
+            text-align: center;
         }
 
         .qr-code {
-            position: absolute;
-            bottom: 15px;
-            right: 15px;
-            width: 60px;
-            height: 60px;
+            width: 80px;
+            height: 80px;
             background: white;
-            padding: 5px;
-            border-radius: 4px;
+            padding: 8px;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
         }
 
         .qr-code img {
             width: 100%;
             height: 100%;
+            display: block;
         }
 
-        .validity-info {
-            position: absolute;
-            bottom: 15px;
-            left: 15px;
+        .qr-label {
+            font-size: 9px;
+            margin-top: 8px;
+            opacity: 0.8;
+        }
+
+        .validity-section {
+            text-align: right;
+            flex: 1;
+            margin-left: 20px;
+        }
+
+        .validity-label {
             font-size: 10px;
+            opacity: 0.8;
+            margin-bottom: 4px;
         }
 
-        .page-break {
-            page-break-after: always;
+        .validity-date {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .verification-info {
+            font-size: 8px;
+            opacity: 0.7;
+            line-height: 1.4;
+        }
+
+        .back-footer {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            text-align: center;
+            font-size: 8px;
+            opacity: 0.7;
+            z-index: 2;
+        }
+
+        .warning-text {
+            border-top: 1px solid rgba(255,255,255,0.2);
+            padding-top: 8px;
+        }
+
+        /* Decorative elements */
+        .decorative-corner {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .decorative-corner.top-left {
+            top: 15px;
+            left: 15px;
+            border-right: none;
+            border-bottom: none;
+        }
+
+        .decorative-corner.bottom-right {
+            bottom: 15px;
+            right: 15px;
+            border-left: none;
+            border-top: none;
+        }
+
+        /* Print optimizations */
+        @media print {
+            body {
+                background: white !important;
+            }
+
+            .page {
+                margin: 0;
+                padding: 20px;
+            }
+
+            .card {
+                box-shadow: none;
+                border: 1px solid #ccc;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Card Front -->
-    <div class="card-container">
-        <div class="card-front">
-            <img src="{{ public_path('storage/' . $card->employee->photo) }}" class="employee-photo" alt="{{ $card->employee->name }}">
+    <!-- PÁGINA DA FRENTE -->
+    <div class="page">
+        <div class="card">
+            <div class="card-front">
+                <div class="decorative-corner top-left"></div>
+                <div class="decorative-corner bottom-right"></div>
 
-            <div style="text-align: right; font-size: 10px; opacity: 0.8;">
-                ID CARD
+                <div class="header">
+                    <div class="company-logo">{{ config('app.name', 'EMPRESA') }}</div>
+                    <div class="card-type">ID CARD</div>
+                </div>
+
+                <div class="content">
+                    <div class="photo-section">
+                        @if($card->employee->photo && file_exists(public_path('storage/' . $card->employee->photo)))
+                            <img src="{{ public_path('storage/' . $card->employee->photo) }}" class="employee-photo" alt="{{ $card->employee->name }}">
+                        @else
+                            <div class="employee-photo" style="background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 10px;">
+                                SEM FOTO
+                            </div>
+                        @endif
+                    </div>
+
+                    <div class="info-section">
+                        <div class="employee-name">{{ $card->employee->name }}</div>
+                        <div class="employee-position">{{ $card->employee->position }}</div>
+                        <div class="employee-department">{{ $card->employee->department }}</div>
+                        <div class="employee-id">ID: {{ $card->employee->identification_number }}</div>
+                    </div>
+                </div>
+
+                <div class="footer">
+                    <div>{{ $card->serial_number }}</div>
+                    <div>{{ $card->issued_date->format('m/Y') }}</div>
+                </div>
             </div>
-
-            <div class="employee-info">
-                <div class="employee-name">{{ $card->employee->name }}</div>
-                <div class="employee-position">{{ $card->employee->position }}</div>
-                <div class="employee-department">{{ $card->employee->department }}</div>
-            </div>
-
-            <div class="serial-number">{{ $card->serial_number }}</div>
-            <div class="issue-date">{{ $card->issued_date->format('m/Y') }}</div>
         </div>
     </div>
 
-    <div class="page-break"></div>
+    <!-- PÁGINA DO VERSO -->
+    <div class="page">
+        <div class="card">
+            <div class="card-back">
+                <div class="decorative-corner top-left"></div>
+                <div class="decorative-corner bottom-right"></div>
 
-    <!-- Card Back -->
-    <div class="card-container">
-        <div class="card-back">
-            <div style="text-align: center; margin-bottom: 20px;">
-                <div style="font-weight: bold; font-size: 12px; margin-bottom: 5px;">
-                    CARTÃO DE IDENTIFICAÇÃO
+                <div class="back-header">
+                    <div class="back-title">Cartão de Identificação</div>
+                    <div class="back-subtitle">Este cartão é propriedade da empresa</div>
                 </div>
-                <div style="font-size: 10px; opacity: 0.7;">
-                    Este cartão é propriedade da empresa
-                </div>
-            </div>
 
-            @if($card->qr_code_path && file_exists(public_path('storage/' . $card->qr_code_path)))
-                <div class="qr-code">
-                    <img src="{{ public_path('storage/' . $card->qr_code_path) }}" alt="QR Code">
-                </div>
-            @endif
+                <div class="back-content">
+                    <div class="qr-section">
+                        @if($card->qr_code_path && file_exists(public_path('storage/' . $card->qr_code_path)))
+                            <div class="qr-code">
+                                <img src="{{ public_path('storage/' . $card->qr_code_path) }}" alt="QR Code">
+                            </div>
+                        @else
+                            <div class="qr-code" style="background: #f8f9fa; display: flex; align-items: center; justify-content: center; color: #666; font-size: 10px;">
+                                QR CODE
+                            </div>
+                        @endif
+                        <div class="qr-label">Escaneie para verificar</div>
+                    </div>
 
-            <div class="validity-info">
-                <div style="opacity: 0.7; margin-bottom: 3px;">Válido até:</div>
-                <div style="font-weight: bold;">{{ $card->expiry_date->format('d/m/Y') }}</div>
-                <div style="opacity: 0.6; font-size: 8px; margin-top: 5px;">
-                    Para verificar: escaneie o QR
+                    <div class="validity-section">
+                        <div class="validity-label">Válido até:</div>
+                        <div class="validity-date">{{ $card->expiry_date->format('d/m/Y') }}</div>
+                        <div class="verification-info">
+                            Para verificar a autenticidade<br>
+                            escaneie o QR code ou acesse:<br>
+                            <strong>{{ parse_url(config('app.url'), PHP_URL_HOST) }}/v/{{ $card->verification_token }}</strong>
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            <div style="position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); text-align: center; font-size: 8px; opacity: 0.6;">
-                Em caso de perda, comunique imediatamente
+                <div class="back-footer">
+                    <div class="warning-text">
+                        Em caso de perda ou roubo, comunique imediatamente ao departamento de segurança<br>
+                        Este documento é intransferível e deve ser portado durante o expediente
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </body>
 </html>
+
