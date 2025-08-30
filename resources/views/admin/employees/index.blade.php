@@ -83,60 +83,66 @@
                                     <div class="flex-shrink-0 w-10 h-10">
                                         <img class="object-cover w-10 h-10 rounded-full" src="{{ $employee->photo_url }}" alt="{{ $employee->name }}">
                                     </div>
-                                    <div class="ml-3">
-                            <h3 class="text-lg font-medium text-red-800">Cartão Não Encontrado</h3>
-                            <p class="text-sm text-red-600">O código QR escaneado não é válido ou não existe no sistema</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="px-6 py-8 text-center">
-                    <svg class="w-16 h-16 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                    </svg>
-                    <h3 class="mt-4 text-lg font-medium text-gray-900">Código Inválido</h3>
-                    <p class="mt-2 text-sm text-gray-500">
-                        O código QR que você escaneou não corresponde a nenhum cartão válido em nosso sistema.
-                    </p>
-
-                    <div class="mt-6">
-                        <p class="text-xs text-gray-600">Possíveis motivos:</p>
-                        <ul class="mt-2 space-y-1 text-xs text-gray-500">
-                            <li>• O cartão foi revogado ou cancelado</li>
-                            <li>• O código QR está danificado</li>
-                            <li>• O cartão não foi emitido por este sistema</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="px-6 py-4 border-t border-gray-200 bg-gray-50">
-                    <div class="text-center">
-                        <p class="text-xs text-gray-500">
-                            Verificado em {{ now()->format('d/m/Y H:i:s') }}
-                        </p>
-                        <p class="mt-1 text-xs text-gray-400">
-                            Em caso de dúvidas, entre em contato com o departamento responsável
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Security Notice -->
-            <div class="p-6 bg-white rounded-lg shadow">
-                <div class="flex items-start">
-                    <div class="flex-shrink-0">
-                        <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-                        </svg>
-                    </div>
-                    <div class="ml-3">
-                        <h3 class="text-sm font-medium text-gray-900">Alerta de Segurança</h3>
-                        <p class="mt-1 text-sm text-gray-600">
-                            Se você acredita que este cartão deveria ser válido, reporte imediatamente à segurança.
-                        </p>
-                    </div>
-                </div>
-            </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900">{{ $employee->name }}</div>
+                                        <div class="text-sm text-gray-500">{{ $employee->email }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{{ $employee->identification_number }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">{{ $employee->department }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">{{ $employee->position }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">{{ $employee->cards_count }} cartão(s)</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="inline-flex px-2 text-xs font-semibold leading-5 rounded-full {{ $employee->status === 'active' ? 'text-green-800 bg-green-100' : 'text-red-800 bg-red-100' }}">
+                                    {{ $employee->status === 'active' ? 'Ativo' : 'Inativo' }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-sm font-medium text-right whitespace-nowrap">
+                                <div class="flex justify-end space-x-2">
+                                    <a href="{{ route('admin.employees.show', $employee) }}" class="text-blue-600 hover:text-blue-900">Ver</a>
+                                    <a href="{{ route('admin.employees.edit', $employee) }}" class="text-indigo-600 hover:text-indigo-900">Editar</a>
+                                    @if($employee->cards_count == 0)
+                                        <form action="{{ route('admin.employees.destroy', $employee) }}" method="POST" class="inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" onclick="return confirm('Tem certeza que deseja excluir este colaborador?')" class="text-red-600 hover:text-red-900">Excluir</button>
+                                        </form>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="7" class="px-6 py-12 text-center">
+                                <div class="text-gray-500">
+                                    <svg class="w-12 h-12 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                    </svg>
+                                    <h3 class="mt-2 text-sm font-medium text-gray-900">Nenhum colaborador encontrado</h3>
+                                    <p class="mt-1 text-sm text-gray-500">Comece criando um novo colaborador.</p>
+                                    <div class="mt-6">
+                                        <a href="{{ route('admin.employees.create') }}" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                            </svg>
+                                            Novo Colaborador
+                                        </a>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
-    </div>
 
+        <!-- Pagination -->
+        @if($employees->hasPages())
+            <div class="px-6 py-4 border-t border-gray-200 bg-gray-50">
+                {{ $employees->links() }}
+            </div>
+        @endif
+    </div>
+</div>
+@endsection
