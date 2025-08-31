@@ -10,7 +10,9 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "arnaldotomo/laravel-lusophone": "^1.0",
         "barryvdh/laravel-dompdf": "^3.1",
+        "intervention/image": "^3.0",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",
         "maatwebsite/excel": "^3.1",
